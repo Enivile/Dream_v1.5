@@ -350,12 +350,8 @@ import { LinearGradient } from 'expo-linear-gradient';
               <Text style={styles.sleeppediaSeeAll}>Show All</Text>
             </TouchableOpacity>
           </View>
-          {/* Blog Cards Section */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.sleeppediaCarousel}
-          >
+          {/* Blog Cards Section - Vertical Layout */}
+          <View style={styles.sleeppediaVerticalContainer}>
             {[
               {
                 id: '1',
@@ -378,7 +374,7 @@ import { LinearGradient } from 'expo-linear-gradient';
             ].map((blog) => (
               <TouchableOpacity 
                 key={blog.id}
-                style={styles.sleeppediaBlogCard}
+                style={styles.sleeppediaBlogCardVertical}
                 onPress={() => navigation.navigate(blog.route)}
                 activeOpacity={0.8}
               >
@@ -388,7 +384,9 @@ import { LinearGradient } from 'expo-linear-gradient';
                   imageStyle={styles.sleeppediaBlogImageStyle}
                 >
                   <LinearGradient 
-                    colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']} 
+                    colors={['rgba(0,0,0,0.8)', 'rgba(0,0,0,0.1)']} 
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 0}}
                     style={styles.sleeppediaBlogGradient}
                   >
                     <View style={styles.sleeppediaBlogContent}>
@@ -399,7 +397,7 @@ import { LinearGradient } from 'expo-linear-gradient';
                 </ImageBackground>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
         
       </ScrollView>
@@ -428,13 +426,22 @@ const styles = StyleSheet.create({
     color: '#6200EE',
     fontSize: 14,
   },
-  sleeppediaCarousel: {
-    paddingRight: 15,
+  sleeppediaVerticalContainer: {
+    width: '100%',
+    backgroundColor: 'rgba(43, 43, 43, 0.3)',
+    borderRadius: 12,
+    padding: 10,
+    // Add glass-like effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  sleeppediaBlogCard: {
-    width: 280,
-    height: 160,
-    marginRight: 15,
+  sleeppediaBlogCardVertical: {
+    width: '100%',
+    height: 60,
+    marginBottom: 10,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: 'rgba(43, 43, 43, 0.76)',
@@ -448,7 +455,7 @@ const styles = StyleSheet.create({
   },
   sleeppediaBlogGradient: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     padding: 15,
     borderRadius: 12,
   },
@@ -462,6 +469,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     flex: 1,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
   containerMain: {
     backgroundColor: "#000000",

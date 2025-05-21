@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '../../firebaseConfig';
+import { firestore, auth } from '../../firebaseConfig';
 
 // Create the authentication context
 const AuthContext = createContext();
@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const auth = getAuth();
 
   // Function to fetch user details from Firestore
   const fetchUserDetails = async (uid) => {

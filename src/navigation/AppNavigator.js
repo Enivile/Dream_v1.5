@@ -5,6 +5,7 @@ import LoaderScreen from "../screens/LoaderScreen";
 import VideoScreen from "../screens/VideoScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
+import SurveyScreen from "../screens/SurveyScreen";
 import HomeNavigator from "./HomeNavigator";
 import MultiSoundPlayer from "../screens/Player/MultiSoundPlayer";
 import MiniPlayer from "../screens/Player/MiniPlayer";
@@ -34,6 +35,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Video" component={VideoScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Survey" component={SurveyScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={HomeNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="MainPlayer" component={MainPlayer} options={{ headerShown: false }} />
         <Stack.Screen name="Player" component={MultiSoundPlayer} options={{ headerShown: false }} />

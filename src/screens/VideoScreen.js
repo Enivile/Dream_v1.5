@@ -5,6 +5,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { StatusBar } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { firestore } from "../../firebaseConfig";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const VideoScreen = () => {
   const [showButtons, setShowButtons] = useState(false);
@@ -56,12 +59,22 @@ const VideoScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
-  const handleNextScreen = () => {
-    navigation.navigate("Main");
+  const handleNextScreen = async () => {
+    try {
+      const surveyCompleted = await AsyncStorage.getItem('surveyCompleted');
+      if (surveyCompleted === 'true') {
+        navigation.navigate("Main");
+      } else {
+        navigation.navigate("Survey");
+      }
+    } catch (error) {
+      console.error('Error checking survey status:', error);
+      navigation.navigate("Survey"); // Default to survey if there's an error
+    }
   };
 
   const handleLogin = () => {
-    navigation.navigate("Login");
+    navigation.navigate("Login", { checkSurvey: true });
   };
   
   const handleSignup = () => {
