@@ -28,13 +28,13 @@ export const initializeNotifications = async () => {
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#0D47A1',
-      sound: 'notification-sound', // Remove .wav extension for Android
+      sound: 'notification_sound', // Remove .wav extension for Android
       audioAttributes: {
         usage: Notifications.AndroidAudioUsage.NOTIFICATION,
         contentType: Notifications.AndroidAudioContentType.SONIFICATION,
       },
     });
-    console.log('Notification channel initialized with custom sound: notification-sound');
+    console.log('Notification channel initialized with custom sound: notification_sound');
   }
 };
 
@@ -185,7 +185,7 @@ export const scheduleSleepReminder = async (time, days) => {
       content: {
         title: "Sleep Reminder",
         body: "It's time to prepare for sleep. Good night!",
-        sound: 'notification-sound', // Remove .wav extension for Android compatibility
+        sound: 'notification_sound', // Remove .wav extension for Android compatibility
         priority: Notifications.AndroidNotificationPriority.HIGH,
         color: "#0D47A1",
       },
@@ -242,7 +242,7 @@ export const scheduleOneTimeSleepReminder = async (time) => {
     content: {
       title: "Sleep Reminder",
       body: "It's time to prepare for sleep. Good night!",
-      sound: 'notification-sound', // Remove .wav extension for Android compatibility
+      sound: 'notification_sound', // Remove .wav extension for Android compatibility
       priority: Notifications.AndroidNotificationPriority.HIGH,
       color: "#0D47A1",
     },
@@ -304,7 +304,7 @@ export const sendTestNotification = async () => {
     content: {
       title: "Test Sleep Reminder",
       body: "This is a test notification for sleep reminders.",
-      sound: 'notification-sound', // Remove .wav extension for Android compatibility
+      sound: 'notification_sound', // Remove .wav extension for Android compatibility
       priority: Notifications.AndroidNotificationPriority.HIGH,
       color: "#0D47A1",
     },

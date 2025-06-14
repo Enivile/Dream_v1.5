@@ -1,5 +1,11 @@
 # Development History
 
+## Android Resource Name Fix for EAS Build
+- Fixed Android build failure in EAS caused by invalid character (hyphen) in notification sound resource name
+- Updated all references to notification sound in sleepReminderService.js to use underscore instead of hyphen
+- Ensured consistency between the actual file name (notification_sound.wav) and references in the code
+- Resolved the Gradle mergeReleaseResources task failure
+
 ## Dependency Fixes for EAS Build
 - Fixed dependency conflicts with `@expo/prebuild-config` and `@expo/metro-config`
 - Added overrides in package.json to ensure all packages use compatible versions
