@@ -1,69 +1,128 @@
-# DreamApp Development History
+# Development History
 
-## Survey Screen Implementation - Latest Update
+## Dependency Fixes for EAS Build
+- Fixed dependency conflicts with `@expo/prebuild-config` and `@expo/metro-config`
+- Added overrides in package.json to ensure all packages use compatible versions
+- Resolved issues that were causing Gradle build failures in EAS
+- All expo-doctor checks now pass successfully
 
-### Changes Made
+## Tab Bar Color Update
+Updated the tab bar color to match the app's theme.
 
-1. **Replaced Placeholder Survey with Full Implementation**
-   - Implemented a multi-question survey flow with 9 questions about sleep habits
-   - Created a smooth, animated question-by-question interface
-   - Added progress indicators to show survey completion status
+## Tab Bar Redesign
+Redesigned the tab bar with a more modern look and improved user experience.
 
-2. **Enhanced User Experience**
-   - Added smooth transitions between questions using react-native-animatable
-   - Implemented glass-like UI elements with expo-blur for option buttons
-   - Created intuitive navigation with Back/Next buttons
+## Background Music Implementation
+Implemented background music feature for better sleep experience.
 
-3. **Data Management**
-   - Survey responses are saved to AsyncStorage for persistence across sessions
-   - For logged-in users, responses are also uploaded to Firebase under the user's document
-   - Survey is skipped on future app launches once completed
+## Survey Loader Screen Enhancement
+Enhanced the survey loader screen with better animations and user feedback.
 
-## White Noise Player Streaming Bug Fix - Previous Update
+## White Noise Player UI Simplification
+Simplified the white noise player UI for better usability.
 
-### Issue Fixed
+## Sleep Reminder Implementation
+Implemented sleep reminder functionality in the profile section:
+- Created a utility service for managing sleep reminders using expo-notifications
+- Added a modal with time picker and day selection for configuring reminders
+- Implemented glass-like UI design for the reminder modal
+- Added ability to schedule, cancel, and test notifications
+- Updated the profile UI to show the current reminder status
+- Configured notification settings in app.json
+- Added custom notification sound (notification-sound.wav) for sleep reminders
+- Updated all notification configurations to use the custom sound file
+- Added comprehensive debugging features to diagnose notification scheduling issues:
+  - Console logs throughout `scheduleSleepReminder` function to track trigger configuration and scheduling process
+  - `debugScheduledNotifications` function to log all currently scheduled notifications
+  - `isRunningInExpoGo` function to detect Expo Go limitations
+  - Debug button in Sleep Reminder Modal for easy access to notification debugging
+- Fixed notification trigger configuration to properly convert weekdays from 0-6 format to 1-7 format required by expo-notifications
+- Added explicit trigger type specification (DAILY/WEEKLY) to address potential scheduling issues
+- Fixed custom notification sound configuration:
+  - Updated notification channel to use filename without .wav extension for Android compatibility
+  - Added proper audioAttributes for notification channel (NOTIFICATION usage, SONIFICATION content type)
+  - Updated all notification content configurations to use consistent sound format
+  - Ensured app.json sounds array correctly references the full file path with extension
 
-1. **Fixed Disappearing Sounds in Player**
-   - Resolved an issue where white noise sounds would disappear from the main player list while still playing
-   - The bug was related to the streaming implementation where the completion callback wasn't accessing the current state correctly
+## Latest Updates
 
-2. **Implementation Details**
-   - Added a reference to track the current state of sounds in the mini player
-   - Modified the download completion callback to use this reference instead of closure variables
-   - Ensured that sound URIs are properly updated after background downloads complete
+### Battery Warning Feature Re-implementation
+- **Complete Feature Re-implementation**: Re-implemented battery warning functionality with enhanced features
+- **Files Created**: 
+  - Created new `BatteryWarningModal.js` component with glass-like design
+  - Created new `batteryWarningService.js` utility service with comprehensive monitoring
+- **Profile Screen Updates**: 
+  - Added battery warning item back to settings section
+  - Added all necessary imports and state management
+  - Added battery warning modal rendering and event handlers
+  - Added battery warning icon assignment
+  - Added initialization code for battery monitoring startup
+- **Enhanced Features**: 
+  - Real-time battery level display using `expo-battery`
+  - Toggle switch to enable/disable battery warnings
+  - Slider for threshold selection (5%-50%)
+  - Test notification functionality
+  - Modern UI with glassmorphism effects
+  - Spam prevention (5-minute cooldown between warnings)
+  - Settings persistence with AsyncStorage
+  - Automatic startup and background monitoring
 
-## White Noise Player UI Simplification - Previous Update
+### Battery Warning UI Enhancement
+- Replaced the grid-based percentage selection with a circular slider UI:
+  - Implemented a radial progress wheel for selecting battery threshold percentage
+  - Added color gradient to visually indicate different threshold levels (red for low, blue for high)
+  - Improved user experience with intuitive drag interaction
+  - Enhanced visual feedback with clear percentage display in the center
 
-### Changes Made
+- Installed required packages:
+  - `react-native-circular-progress-indicator` for the radial slider
+  - `react-native-svg` and `react-native-reanimated` as dependencies
 
-1. **Simplified White Noise Player UI**
-   - Removed download progress indicators from sound buttons
-   - Maintained streaming and background downloading functionality
-   - Streamlined the user interface for a cleaner look
+### Battery Warning UI Refinement
+- Replaced the circular slider with a more space-efficient wheel picker UI:
+  - Implemented a horizontal wheel picker for selecting battery threshold percentage
+  - Reduced vertical space usage to improve overall modal layout
+  - Enhanced visual feedback with highlighted selected value and faded adjacent options
+  - Maintained the same 5%-50% range with 5% increments for consistency
+  - Added haptic feedback for better user interaction
 
-2. **Code Cleanup**
-   - Removed progress tracking state and related code
-   - Eliminated unused style definitions
-   - Simplified the streaming implementation while preserving functionality
+- Installed required package:
+  - `react-native-wheel-picker-expo` for the wheel picker component
 
-## White Noise Player Streaming Implementation - Previous Update
+### Battery Warning UI Simplification
+- Simplified the Battery Warning Modal UI:
+  - Removed the percentage selection UI components below the "Warning Threshold" heading
+  - Streamlined the interface for a cleaner, more minimal appearance
+  - Prepared the UI for future implementation of a different selection mechanism
 
-### Technical Improvements
+### Previous Battery Warning Work (Now Removed):
+- Had implemented battery warning modal with CSS fixes for display issues
+- Had added Android compatibility with `statusBarTranslucent={true}` prop
+- Had fixed z-index and elevation issues for proper modal layering
+- Had resolved missing `expo-notifications` import issue
+- **Added Debugging Logs**: Added console.log statements to `Profile.js` handleItemPress function to track button presses and modal state changes
+- **Added Modal Debugging**: Added console.log statements to `BatteryWarningModal.js` to track when the modal receives props and when useEffect is triggered
 
-1. **Immediate Audio Streaming**
-   - Implemented immediate audio streaming from remote URLs when files aren't cached locally
-   - Added background downloading that happens simultaneously with streaming
+### Battery Warning Functionality Implementation
+- **Created `batteryWarningService.js`**: Comprehensive battery monitoring service with customizable warning thresholds (5-50%) and smart notification system with 30-minute cooldown to prevent spam
+- **Created `BatteryWarningModal.js`**: Glass-like design modal with interactive slider, toggle switch, test notification feature, and real-time battery status display
+- **Updated `Profile.js`**: Integrated battery warning functionality with automatic startup if enabled, settings persistence via AsyncStorage, and status display on Profile screen
+- **Installed Dependencies**: Added `expo-battery` for cross-platform battery monitoring and `@react-native-community/slider` for the percentage selector
+- **Features**: Customizable warning percentage, notification cooldown system, test notifications, real-time battery level display, automatic monitoring startup, and comprehensive error handling
+- **Permissions**: Proper notification permission management and battery optimization handling for Android devices
 
-2. **Enhanced User Experience**
-   - Eliminated waiting time for audio playback by prioritizing streaming
-   - Maintained the app's existing design language with glass-like UI elements
-
-3. **Smart Caching System**
-   - Implemented intelligent file checking to use local files when available
-   - Optimized network usage by caching downloaded files for future use
-   - Ensured seamless transitions between streaming and local playback
-
-### Implementation Details
-
-1. **New Utility Functions in `firebaseAudioDownloader.js`**
-   - Added `streamAndDownloadAudio` function for simultaneous streaming and downloading
+## Battery Warning Implementation
+Implemented comprehensive battery warning functionality in the profile section:
+- Created `batteryWarningService.js` utility for managing battery monitoring using expo-battery
+- Added battery level monitoring with customizable warning percentage thresholds (5-50%)
+- Implemented notification system with 30-minute cooldown to prevent spam
+- Created `BatteryWarningModal.js` component with glass-like UI design matching app theme
+- Added real-time battery status display showing current level, charging state, and low power mode
+- Integrated battery warning settings into Profile.js with toggle functionality
+- Added test notification feature for users to verify functionality
+- Implemented automatic battery monitoring startup when warnings are enabled
+- Used expo-battery API for cross-platform battery level detection and monitoring
+- Added @react-native-community/slider for intuitive percentage selection
+- Updated Profile.js to display current battery warning status and threshold percentage
+- Configured battery warning notifications to use custom notification sound
+- Added comprehensive error handling and permission management for battery monitoring

@@ -8,6 +8,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import * as Animatable from 'react-native-animatable';
 import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons'; // Added Ionicons import
 
 const { width, height } = Dimensions.get('window');
 
@@ -134,6 +135,16 @@ const SurveyScreen = () => {
       ...prev,
       [questionId]: optionId
     }));
+    
+    // Auto-advance to next question after a short delay
+    setTimeout(() => {
+      if (currentQuestionIndex < surveyQuestions.length - 1) {
+        handleNext();
+      } else if (!isSubmitting) {
+        // If it's the last question, submit the survey
+        submitSurvey();
+      }
+    }, 500); // 500ms delay before advancing
   };
 
   const handleNext = () => {
@@ -189,8 +200,8 @@ const SurveyScreen = () => {
         await setDoc(doc(firestore, 'users', currentUser.uid, 'surveys', 'sleepSurvey'), surveyData);
       }
       
-      // Navigate to main app flow
-      navigation.navigate('Main');
+      // Navigate to loader screen instead of main app flow
+      navigation.navigate('SurveyLoader');
     } catch (error) {
       console.error('Error completing survey:', error);
     } finally {
@@ -204,6 +215,16 @@ const SurveyScreen = () => {
 
   return (
     <LinearGradient colors={['#121212', '#000000']} style={styles.container}>
+      {/* Back button at top-left */}
+      {currentQuestionIndex > 0 && (
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={handleBack}
+        >
+          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      )}
+      
       <View style={styles.progressContainer}>
         {surveyQuestions.map((_, index) => (
           <View 
@@ -251,30 +272,7 @@ const SurveyScreen = () => {
         </View>
       </Animatable.View>
       
-      <View style={styles.navigationContainer}>
-        {currentQuestionIndex > 0 && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={handleBack}
-          >
-            <Text style={styles.backButtonText}>Back</Text>
-          </TouchableOpacity>
-        )}
-        
-        <TouchableOpacity 
-          style={[styles.nextButton, !isAnswered && styles.disabledButton]} 
-          onPress={handleNext}
-          disabled={!isAnswered || isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.nextButtonText}>
-              {isLastQuestion ? 'Submit' : 'Next'}
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
+      {/* Removed the navigation container with back/next buttons */}
     </LinearGradient>
   );
 };
@@ -288,6 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 50 : 40,
+    marginTop: 20,
     paddingBottom: 20,
   },
   progressDot: {
@@ -363,10 +362,16 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   backButton: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 50 : 40, // Adjusted to be below status bar
+    left: 20,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backButtonText: {
     color: '#FFFFFF',

@@ -102,7 +102,6 @@ const VideoScreen = () => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.roundButton} onPress={handleNextScreen}>
             <Ionicons name="arrow-forward" size={24} color="#000" />
-            <Text style={styles.buttonText}>Continue without login</Text>
           </TouchableOpacity>
           
           <View style={styles.authButtonsContainer}>
@@ -134,10 +133,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    borderRadius: 50,
   },
   buttonText: {
     color: '#000',
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
   },
   authButton: {
     backgroundColor: "rgba(29, 185, 84, 0)", // Green with opacity
-    paddingVertical: 12,
+    paddingVertical: 1,
     paddingHorizontal: 25,
     borderRadius: 25,
     marginHorizontal: 10,
@@ -161,9 +160,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.25)", // White with opacity
   },
   authButtonText: {
-    fontSize: 16,
-    color: "#FFF",
-    fontWeight: "bold",
+    fontSize: 18,
+    color: "#8c8c8c",
   },
 });
 
