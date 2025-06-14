@@ -3,10 +3,11 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, ActivityIndicator,
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { firestore } from '../../firebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation, route }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,8 +38,24 @@ const LoginScreen = ({ navigation }) => {
         console.log('User account type:', userData.accountType);
       }
 
-      // Navigate to main screen after successful login
-      navigation.navigate('Main');
+      // Check if we need to verify survey completion
+      const checkSurvey = route.params?.checkSurvey || false;
+      
+      if (checkSurvey) {
+        // Check if survey is completed
+        const surveyCompleted = await AsyncStorage.getItem('surveyCompleted');
+        
+        if (surveyCompleted === 'true') {
+          // Survey already completed, go to main screen
+          navigation.navigate('Main');
+        } else {
+          // Survey not completed, go to survey screen
+          navigation.navigate('Survey');
+        }
+      } else {
+        // No need to check survey, go to main screen
+        navigation.navigate('Main');
+      }
     } catch (error) {
       let errorMessage = 'Failed to sign in';
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {

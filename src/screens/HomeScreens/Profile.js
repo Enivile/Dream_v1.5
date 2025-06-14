@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList, ActivityIndicator } from 'react-native';
 import { SvgUri } from 'react-native-svg';
-import { Ionicons } from "@expo/vector-icons";
-import { StatusBar } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import SleepReminderModal from '../../components/SleepReminderModal';
+import BatteryWarningModal from '../../components/BatteryWarningModal';
+import * as SleepReminderService from '../../utils/sleepReminderService';
+import * as BatteryWarningService from '../../utils/batteryWarningService';
 
 // Initial sections data structure
 const initialSections = [
-  {
-    title: "Tracker",
-    data: [
-      { id: "1", name: "Wake-up Alarm", value: "Off" },
-      { id: "2", name: "Placement", value: "On" },
-      { id: "3", name: "Battery Warning", value: "On" },
-      { id: "4", name: "Sleep Note", value: "Off" },
-      { id: "5", name: "Wake-up Mood", value: "On" },
-    ],
-  },
+  // {
+  //   title: "Tracker",
+  //   data: [
+  //     { id: "1", name: "Wake-up Alarm", value: "Off" },
+  //     { id: "2", name: "Placement", value: "On" },
+  //     { id: "4", name: "Sleep Note", value: "Off" },
+  //     { id: "5", name: "Wake-up Mood", value: "On" },
+  //   ],
+  // },
   {
     title: "Settings",
     data: [
       { id: "6", name: "Language", value: "Automatic" },
       { id: "7", name: "Sleep Reminder", value: "Off" },
+      { id: "7.5", name: "Battery Warning", value: "Off" },
       { id: "8", name: "Rate Us", value: "" },
       { id: "9", name: "Feedback", value: "" },
       { id: "10", name: "More", value: "" },
@@ -37,11 +41,150 @@ const ProfileScreen = () => {
   
   // State for sections data
   const [sections, setSections] = useState(initialSections);
+  const [showSleepReminderModal, setShowSleepReminderModal] = useState(false);
+  const [showBatteryWarningModal, setShowBatteryWarningModal] = useState(false);
+
+  
+  // Initialize notifications when component mounts
+  useEffect(() => {
+    const initNotifications = async () => {
+      await SleepReminderService.initializeNotifications();
+    };
+    
+    initNotifications();
+  }, []);
+
+  // Initialize and update battery warning service and UI
+  useEffect(() => {
+    const initializeBatteryWarning = async () => {
+      try {
+        await BatteryWarningService.initializeBatteryWarning();
+        const status = await BatteryWarningService.getBatteryWarningStatus();
+        
+        setSections(prevSections => 
+          prevSections.map(section => {
+            if (section.title === 'Settings') {
+              return {
+                ...section,
+                data: section.data.map(item => 
+                  item.name === 'Battery Warning' 
+                    ? { ...item, value: status.enabled ? `${status.threshold}%` : 'Off' }
+                    : item
+                )
+              };
+            }
+            return section;
+          })
+        );
+      } catch (error) {
+        console.error('Error initializing battery warning:', error);
+      }
+    };
+
+    initializeBatteryWarning();
+  }, []);
+  
+
+  
+  // Update UI when sleep reminder settings change
+  useEffect(() => {
+    const updateSleepReminderStatus = async () => {
+      try {
+        const isEnabled = await SleepReminderService.areSleepRemindersEnabled();
+        const settings = await SleepReminderService.getSleepReminderSettings();
+        
+        // Update the sections data with the current status
+        setSections(prevSections => {
+          return prevSections.map(section => {
+            if (section.title === 'Settings') {
+              return {
+                ...section,
+                data: section.data.map(item => {
+                  if (item.name === 'Sleep Reminder') {
+                    // Format time for display (convert from 24h to 12h format)
+                    let displayTime = 'Off';
+                    if (isEnabled && settings.time) {
+                      const [hours, minutes] = settings.time.split(':').map(Number);
+                      const period = hours >= 12 ? 'PM' : 'AM';
+                      const displayHours = hours % 12 || 12; // Convert 0 to 12
+                      displayTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+                    }
+                    
+                    return {
+                      ...item,
+                      value: isEnabled ? displayTime : 'Off'
+                    };
+                  }
+                  return item;
+                })
+              };
+            }
+            return section;
+          });
+        });
+      } catch (error) {
+        console.error('Error updating sleep reminder status:', error);
+      }
+    };
+    
+    updateSleepReminderStatus();
+  }, [showSleepReminderModal]);
+
+  // Update UI when battery warning settings change
+  useEffect(() => {
+    const updateBatteryWarningStatus = async () => {
+      try {
+        const status = await BatteryWarningService.getBatteryWarningStatus();
+        
+        setSections(prevSections => {
+          return prevSections.map(section => {
+            if (section.title === 'Settings') {
+              return {
+                ...section,
+                data: section.data.map(item => {
+                  if (item.name === 'Battery Warning') {
+                    return {
+                      ...item,
+                      value: status.enabled ? `${status.threshold}%` : 'Off'
+                    };
+                  }
+                  return item;
+                })
+              };
+            }
+            return section;
+          });
+        });
+      } catch (error) {
+        console.error('Error updating battery warning status:', error);
+      }
+    };
+    
+    updateBatteryWarningStatus();
+  }, [showBatteryWarningModal]);
   
   // Handle item press in the settings list
   const handleItemPress = (item) => {
+    console.log('Item pressed:', item.name);
+    
+    // Handle sleep reminder
+    if (item.name === 'Sleep Reminder') {
+      console.log('Opening Sleep Reminder Modal');
+      setShowSleepReminderModal(true);
+      return;
+    }
+
+    // Handle battery warning
+    if (item.name === 'Battery Warning') {
+      console.log('Opening Battery Warning Modal');
+      setShowBatteryWarningModal(true);
+      return;
+    }
+    
+
+    
     // Handle other items as needed
-    // Sleep reminder functionality has been removed
+    console.log('No handler for item:', item.name);
   };
 
   const handleLogin = () => {
@@ -66,9 +209,9 @@ const ProfileScreen = () => {
     return (
       <View style={styles.container}>
         <StatusBar 
-          barStyle="light-content"
-          translucent={true}
-          backgroundColor="transparent"
+        barStyle="light-content" // Changes text/icons to white
+        translucent={true} // Makes status bar transparent
+        backgroundColor="transparent" // Keeps background transparent
         />
         <View style={styles.notLoggedInContainer}>
           <Image 
@@ -105,12 +248,24 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar 
-        barStyle="light-content"
-        translucent={true}
-        backgroundColor="transparent"
+        barStyle="light-content" // Changes text/icons to white
+        translucent={true} // Makes status bar transparent
+        backgroundColor="transparent" // Keeps background transparent
+        />
+      
+      {/* Sleep Reminder Modal */}
+      <SleepReminderModal
+        visible={showSleepReminderModal}
+        onClose={() => setShowSleepReminderModal(false)}
       />
       
-      {/* Sleep Reminder Modal removed */}
+      {/* Battery Warning Modal */}
+      <BatteryWarningModal
+        visible={showBatteryWarningModal}
+        onClose={() => setShowBatteryWarningModal(false)}
+      />
+      
+
       <View style={styles.profileContainer}>
         {currentUser.photoURL ? (
           <Image
@@ -177,15 +332,16 @@ const ProfileScreen = () => {
               let iconName = "settings-outline";
               
               // Tracker section icons
-              if (subItem.name === "Wake-up Alarm") iconName = "alarm-outline";
-              if (subItem.name === "Placement") iconName = "bed-outline";
-              if (subItem.name === "Battery Warning") iconName = "battery-half-outline";
-              if (subItem.name === "Sleep Note") iconName = "document-text-outline";
-              if (subItem.name === "Wake-up Mood") iconName = "happy-outline";
+              // if (subItem.name === "Wake-up Alarm") iconName = "alarm-outline";
+              // if (subItem.name === "Placement") iconName = "bed-outline";
+
+              // if (subItem.name === "Sleep Note") iconName = "document-text-outline";
+              // if (subItem.name === "Wake-up Mood") iconName = "happy-outline";
               
               // Settings section icons
               if (subItem.name === "Language") iconName = "language-outline";
               if (subItem.name === "Sleep Reminder") iconName = "notifications-outline";
+              if (subItem.name === "Battery Warning") iconName = "battery-half-outline";
               if (subItem.name === "Rate Us") iconName = "star-outline";
               if (subItem.name === "Feedback") iconName = "chatbubble-outline";
               if (subItem.name === "More") iconName = "ellipsis-horizontal-outline";

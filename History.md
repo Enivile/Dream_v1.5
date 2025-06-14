@@ -1,219 +1,128 @@
-# DreamApp Development History
+# Development History
 
-## BlurView Removal - Latest Update
+## Dependency Fixes for EAS Build
+- Fixed dependency conflicts with `@expo/prebuild-config` and `@expo/metro-config`
+- Added overrides in package.json to ensure all packages use compatible versions
+- Resolved issues that were causing Gradle build failures in EAS
+- All expo-doctor checks now pass successfully
 
-In this update, we removed the BlurView component and its dependency from the app:
+## Tab Bar Color Update
+Updated the tab bar color to match the app's theme.
 
-### Changes Made:
+## Tab Bar Redesign
+Redesigned the tab bar with a more modern look and improved user experience.
 
-1. **Removed BlurView Component**
-   - Removed the BlurView import from MultiSoundPlayer.js
-   - Removed the @react-native-community/blur dependency from package.json
-   - Simplified the app by removing an unused component
-   - Reduced app bundle size by eliminating an unnecessary dependency
+## Background Music Implementation
+Implemented background music feature for better sleep experience.
 
-## BlurView Import Path Fix - Previous Update
+## Survey Loader Screen Enhancement
+Enhanced the survey loader screen with better animations and user feedback.
 
-In this update, we fixed an issue with the BlurView component import in the MultiSoundPlayer.js file:
+## White Noise Player UI Simplification
+Simplified the white noise player UI for better usability.
 
-### Changes Made:
+## Sleep Reminder Implementation
+Implemented sleep reminder functionality in the profile section:
+- Created a utility service for managing sleep reminders using expo-notifications
+- Added a modal with time picker and day selection for configuring reminders
+- Implemented glass-like UI design for the reminder modal
+- Added ability to schedule, cancel, and test notifications
+- Updated the profile UI to show the current reminder status
+- Configured notification settings in app.json
+- Added custom notification sound (notification_sound.wav) for sleep reminders
+- Updated all notification configurations to use the custom sound file
+- Added comprehensive debugging features to diagnose notification scheduling issues:
+  - Console logs throughout `scheduleSleepReminder` function to track trigger configuration and scheduling process
+  - `debugScheduledNotifications` function to log all currently scheduled notifications
+  - `isRunningInExpoGo` function to detect Expo Go limitations
+  - Debug button in Sleep Reminder Modal for easy access to notification debugging
+- Fixed notification trigger configuration to properly convert weekdays from 0-6 format to 1-7 format required by expo-notifications
+- Added explicit trigger type specification (DAILY/WEEKLY) to address potential scheduling issues
+- Fixed custom notification sound configuration:
+  - Updated notification channel to use filename without .wav extension for Android compatibility
+  - Added proper audioAttributes for notification channel (NOTIFICATION usage, SONIFICATION content type)
+  - Updated all notification content configurations to use consistent sound format
+  - Ensured app.json sounds array correctly references the full file path with extension
 
-1. **Fixed BlurView Import Path**
-   - Modified the import statement for BlurView in MultiSoundPlayer.js
-   - Changed from `import { BlurView } from "@react-native-community/blur"` to `import { BlurView } from "@react-native-community/blur/lib/commonjs"`
-   - Resolved the error: "Unable to resolve './components/BlurView' from 'node_modules\@react-native-community\blur\lib\module\index.js'"
-   - Ensured the BlurView component is correctly imported from the package
+## Latest Updates
 
-## Sleeppedia UI Reorganization - Previous Update
+### Battery Warning Feature Re-implementation
+- **Complete Feature Re-implementation**: Re-implemented battery warning functionality with enhanced features
+- **Files Created**: 
+  - Created new `BatteryWarningModal.js` component with glass-like design
+  - Created new `batteryWarningService.js` utility service with comprehensive monitoring
+- **Profile Screen Updates**: 
+  - Added battery warning item back to settings section
+  - Added all necessary imports and state management
+  - Added battery warning modal rendering and event handlers
+  - Added battery warning icon assignment
+  - Added initialization code for battery monitoring startup
+- **Enhanced Features**: 
+  - Real-time battery level display using `expo-battery`
+  - Toggle switch to enable/disable battery warnings
+  - Slider for threshold selection (5%-50%)
+  - Test notification functionality
+  - Modern UI with glassmorphism effects
+  - Spam prevention (5-minute cooldown between warnings)
+  - Settings persistence with AsyncStorage
+  - Automatic startup and background monitoring
 
-In this update, we reorganized the Sleeppedia feature to improve user experience:
+### Battery Warning UI Enhancement
+- Replaced the grid-based percentage selection with a circular slider UI:
+  - Implemented a radial progress wheel for selecting battery threshold percentage
+  - Added color gradient to visually indicate different threshold levels (red for low, blue for high)
+  - Improved user experience with intuitive drag interaction
+  - Enhanced visual feedback with clear percentage display in the center
 
-### Changes Made:
+- Installed required packages:
+  - `react-native-circular-progress-indicator` for the radial slider
+  - `react-native-svg` and `react-native-reanimated` as dependencies
 
-1. **Removed Sleeppedia from Bottom Navigation**
-   - Removed the Sleeppedia tab from the bottom navigation bar
-   - Simplified the main navigation to focus on core app features
+### Battery Warning UI Refinement
+- Replaced the circular slider with a more space-efficient wheel picker UI:
+  - Implemented a horizontal wheel picker for selecting battery threshold percentage
+  - Reduced vertical space usage to improve overall modal layout
+  - Enhanced visual feedback with highlighted selected value and faded adjacent options
+  - Maintained the same 5%-50% range with 5% increments for consistency
+  - Added haptic feedback for better user interaction
 
-2. **Added Sleeppedia Section to HomePage**
-   - Added a new Sleeppedia section to the HomePage with three blog previews
-   - Implemented a "Show All" button that navigates to the full Sleeppedia screen
-   - Maintained consistent styling with other HomePage sections
-   - Used glass-like UI elements with gradient overlays for a premium look
+- Installed required package:
+  - `react-native-wheel-picker-expo` for the wheel picker component
 
-## Sleeppedia Blog Section Implementation - Previous Update
+### Battery Warning UI Simplification
+- Simplified the Battery Warning Modal UI:
+  - Removed the percentage selection UI components below the "Warning Threshold" heading
+  - Streamlined the interface for a cleaner, more minimal appearance
+  - Prepared the UI for future implementation of a different selection mechanism
 
-In this update, we implemented a comprehensive Sleeppedia blog section with detailed information about various sleep disorders:
+### Previous Battery Warning Work (Now Removed):
+- Had implemented battery warning modal with CSS fixes for display issues
+- Had added Android compatibility with `statusBarTranslucent={true}` prop
+- Had fixed z-index and elevation issues for proper modal layering
+- Had resolved missing `expo-notifications` import issue
+- **Added Debugging Logs**: Added console.log statements to `Profile.js` handleItemPress function to track button presses and modal state changes
+- **Added Modal Debugging**: Added console.log statements to `BatteryWarningModal.js` to track when the modal receives props and when useEffect is triggered
 
-### Changes Made:
+### Battery Warning Functionality Implementation
+- **Created `batteryWarningService.js`**: Comprehensive battery monitoring service with customizable warning thresholds (5-50%) and smart notification system with 30-minute cooldown to prevent spam
+- **Created `BatteryWarningModal.js`**: Glass-like design modal with interactive slider, toggle switch, test notification feature, and real-time battery status display
+- **Updated `Profile.js`**: Integrated battery warning functionality with automatic startup if enabled, settings persistence via AsyncStorage, and status display on Profile screen
+- **Installed Dependencies**: Added `expo-battery` for cross-platform battery monitoring and `@react-native-community/slider` for the percentage selector
+- **Features**: Customizable warning percentage, notification cooldown system, test notifications, real-time battery level display, automatic monitoring startup, and comprehensive error handling
+- **Permissions**: Proper notification permission management and battery optimization handling for Android devices
 
-1. **Created New Blog Detail Pages**
-   - Added `SnoringDetail.js` with information about snoring causes and treatments
-   - Added `BreathingDetail.js` with information about sleep apnea
-   - Added `BruxismDetail.js` with information about teeth grinding
-   - Added `RestlessLegDetail.js` with information about restless leg syndrome
-   - Each page follows a consistent design with a dark theme and glass-like UI elements
-
-2. **Updated Navigation**
-   - Added all new blog detail screens to the AppNavigator
-   - Ensured proper navigation between the main Sleeppedia screen and individual blog pages
-   - Maintained consistent header styling and back button functionality
-
-3. **Enhanced UI Design**
-   - Implemented glass-like effects for all containers
-   - Used LinearGradient backgrounds for a premium look
-   - Added shadow effects to images and containers
-   - Organized content with clear section headers and bullet points
-   - Ensured consistent styling across all blog pages
-
-## React Navigation Dependency Fix - Previous Update
-
-In this update, we fixed a dependency conflict between React Navigation packages and the React Native version:
-
-### Changes Made:
-
-1. **Downgraded React Navigation Packages**
-   - Changed `@react-navigation/bottom-tabs` from version 7.x to 6.5.11
-   - Changed `@react-navigation/native` from version 7.x to 6.1.9
-   - Changed `@react-navigation/native-stack` from version 7.x to 6.9.17
-   - Changed `@react-navigation/stack` from version 7.x to 6.3.20
-   - Used `--legacy-peer-deps` flag to resolve remaining peer dependency conflicts
-
-2. **Resolved Compatibility Issue**
-   - Fixed the error where `@react-navigation/bottom-tabs@7.3.11` required `react-native@0.79.2` while the project was using `react-native@0.76.9`
-   - Ensured all navigation packages are compatible with the current React Native version
-
-## ScrollTimeline Math Bug Fix - Previous Update
-
-In this update, we fixed a math bug in the ScrollTimeline component of MultiSoundPlayer.js that was causing incorrect time values when scrolling:
-
-### Changes Made:
-
-1. **Fixed Timeline Offset Calculations**
-   - Fixed an issue where scrolling all the way to the left (which should be 0 min) was incorrectly snapping to 35 min
-   - Removed the problematic `+ tickSpacing` from the `initialScrollPosition` calculation
-   - Removed the problematic `- tickSpacing` from the `rawValue` calculation in both `handleScroll` and `handleScrollEnd`
-   - Removed the problematic `+ tickSpacing` from the `snappedX` calculation in `handleScrollEnd`
-   - Ensured tick 0 aligns properly under the center indicator when scrollX is 0
-   - Fixed the timeline to correctly snap to values from 0 to 120 minutes as expected
-
-## Timer Behavior and UI Alignment Fix - Previous Update
-
-In this update, we fixed issues with the timer implementation in the MultiSoundPlayer component:
-
-### Changes Made:
-
-1. **Fixed Timer Start Behavior**
-   - Modified the timer to only start when the Start button is pressed, not when the slider is released
-   - Separated the slider completion event from the timer start action
-   - Ensured the timer duration is properly updated during scrolling without automatically starting
-   - Added a dedicated Start button action that explicitly starts the timer with the selected duration
-
-2. **Corrected Slider and Time Display Alignment**
-   - Fixed alignment issues between the slider markings and the displayed time value
-   - Repositioned the time display to better align with the slider position
-   - Ensured the timeline tick marks correctly correspond to the displayed time value
-   - Added initialValue dependency to the ScrollTimeline component to update when the value changes
-
-## Timer Slider Improvements - Latest Update
-
-In this update, we improved the timer slider in the MultiSoundPlayer component:
-
-- Made the slider's fill color transparent for a cleaner, more minimal look
-- Improved the slider's behavior to only update values when sliding is complete, not during sliding
-- Enhanced the user experience by making the slider more smooth and responsive
-- Maintained the visual display updates during sliding for better feedback
-- Kept the 5-minute interval snapping for precise time selection
-
-## Timer Slider Redesign - Previous Update
-
-In the previous update, we completely redesigned the timer selection interface in the MultiSoundPlayer component:
-
-- Replaced the ScrollTimeline component with a new TimerSlider component that uses the standard Slider for better accuracy
-- Fixed alignment issues with interval markers to ensure proper positioning
-- Improved visual consistency with a cleaner design and better spacing
-- Added direct value display that updates in real-time during sliding
-- Ensured the displayed value matches exactly with the slider position
-- Implemented proper snapping to 5-minute intervals for precise time selection
-
-3. **Enhanced Visual Design**
-   - Updated the UI to match the reference design with a glassy appearance
-   - Improved the Start button styling with a rectangular shape and full width
-   - Adjusted spacing and margins for better visual hierarchy
-   - Enhanced shadow and glow effects for a premium look
-
-## Advanced Timeline Timer Implementation - Previous Update
-
-In this update, we replaced the slider-based timer with an advanced horizontally scrollable timeline interface in the MultiSoundPlayer component:
-
-## Enhanced Timer UI Implementation - Previous Update
-
-### Changes Made:
-
-1. **Updated MultiSoundPlayer.js Timer Interface**
-   - Replaced button-based timer selection with an intuitive slider interface
-   - Implemented 5-minute interval selection with a range up to 8 hours
-   - Added visual tick marks for time reference points
-   - Created a fixed time display in the center showing the currently selected duration
-   - Maintained the countdown display on the timer button when active
-   - Kept automatic playback stopping functionality when timer expires
-
-2. **UI/UX Improvements**
-   - Added a premium glassy appearance with transparency effects
-   - Implemented a modern slider with custom styling
-   - Created a large, prominent time display
-   - Added a purple accent color scheme with glowing effects
-   - Improved button styling with subtle borders and shadows
-   - Enhanced overall modal layout for better usability
-
-## White Noise Player Behavior Update - Previous Update
-
-In this update, we modified the white noise player behavior to show the MiniPlayer instead of the MainPlayer when a sound is clicked:
-
-### Changes Made:
-
-1. **Updated WNall.js**
-   - Modified the `handleDownload` function to no longer navigate to the MainPlayer screen
-   - Kept the functionality to show the MiniPlayer when a sound is clicked
-   - Removed the navigation.navigate("MainPlayer") call
-
-2. **Updated WNmixes.js**
-   - Modified the `handlePlayMix` function to no longer navigate to the MainPlayer screen
-   - Kept the functionality to show the MiniPlayer when a mix is clicked
-   - Removed the navigation.navigate("MainPlayer") call
-
-## Sleep Reminder Removal - Previous Update
-
-In this update, we removed the sleep reminder functionality while keeping the UI button in place:
-
-### Changes Made:
-
-1. **Removed AlarmService Utility**
-   - Deleted the AlarmService.js utility file that was previously used for managing alarms and reminders
-   - Removed all related alarm scheduling and notification functionality
-
-2. **Removed SleepReminderModal Component**
-   - Deleted the SleepReminderModal.js component file
-   - Removed all UI elements for setting and editing sleep reminders
-
-3. **Updated Profile Screen**
-   - Removed all sleep reminder functionality from the Profile.js file
-   - Kept the "Sleep Reminder" button in the UI but removed its onClick functionality
-   - Removed imports for SleepReminderModal and AlarmService
-   - Removed state variables and functions related to sleep reminders
-
-## Sleep Reminder Implementation - Previous Update
-
-In a previous update, we implemented a reusable sleep reminder functionality that could be used across the app:
-
-### Technical Details:
-
-- Used Expo Notifications API for scheduling notifications
-- Implemented AsyncStorage for persisting reminder settings
-- Created a clean separation between UI components and alarm logic
-- Ensured the alarm system is reusable for future features
-
-### Next Steps:
-
-- Consider adding more customization options for reminders (sound, vibration, etc.)
-- Implement analytics to track reminder effectiveness
-- Add support for multiple reminders in the future
+## Battery Warning Implementation
+Implemented comprehensive battery warning functionality in the profile section:
+- Created `batteryWarningService.js` utility for managing battery monitoring using expo-battery
+- Added battery level monitoring with customizable warning percentage thresholds (5-50%)
+- Implemented notification system with 30-minute cooldown to prevent spam
+- Created `BatteryWarningModal.js` component with glass-like UI design matching app theme
+- Added real-time battery status display showing current level, charging state, and low power mode
+- Integrated battery warning settings into Profile.js with toggle functionality
+- Added test notification feature for users to verify functionality
+- Implemented automatic battery monitoring startup when warnings are enabled
+- Used expo-battery API for cross-platform battery level detection and monitoring
+- Added @react-native-community/slider for intuitive percentage selection
+- Updated Profile.js to display current battery warning status and threshold percentage
+- Configured battery warning notifications to use custom notification sound
+- Added comprehensive error handling and permission management for battery monitoring

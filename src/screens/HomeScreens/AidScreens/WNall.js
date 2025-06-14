@@ -5,10 +5,10 @@
  * and play. It integrates with the MiniPlayerContext to manage sound playback and navigation.
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // For displaying icons
-import { downloadAudioFromFirebase } from "../../../utils/firebaseAudioDownloader";
+import { streamAndDownloadAudio, checkLocalAudioFile } from "../../../utils/firebaseAudioDownloader";
 import * as FileSystem from "expo-file-system"; // For local file operations
 import { useNavigation } from "@react-navigation/native"; // For navigation between screens
 import { useMiniPlayer } from "../../../context/MiniPlayerContext"; // For managing sound playback
@@ -115,15 +115,24 @@ const WNall = () => {
   const navigation = useNavigation();
   
   // Access mini player context functions and state
-  const { miniPlayerSounds, updateMiniPlayerSounds, showMiniPlayer } = useMiniPlayer();
+  const { miniPlayerSounds, updateMiniPlayerSounds, showMiniPlayer, removeSoundFromMiniPlayer } = useMiniPlayer();
+  
+  // Ref to keep track of the current miniPlayerSounds for use in callbacks
+  const miniPlayerSoundsRef = useRef(miniPlayerSounds);
+  
+  // Update the ref whenever miniPlayerSounds changes
+  useEffect(() => {
+    miniPlayerSoundsRef.current = miniPlayerSounds;
+  }, [miniPlayerSounds]);
 
   /**
-   * Handles the download and playback of a selected sound
+   * Handles the streaming and background download of a selected sound
    * 
    * This function:
-   * 1. Checks if the sound exists in Firebase
-   * 2. Downloads the sound if it's not already on the device
-   * 3. Adds the sound to the mini player and shows the mini player
+   * 1. Checks if the sound exists locally
+   * 2. If local, plays from local file
+   * 3. If not local, streams immediately while downloading in background
+   * 4. Adds the sound to the mini player and shows the mini player
    * 
    * @param {Object} item - The sound item that was selected
    * @param {string} item.id - Unique identifier for the sound
@@ -140,35 +149,58 @@ const WNall = () => {
 
     // Extract the filename from the path
     const fileName = firebasePath.split("/").pop();
-    const localUri = FileSystem.documentDirectory + fileName;
-
+    
     try {
       // Add this sound's ID to the loading state to show loading indicator
       setLoadingIds((prev) => [...prev, item.id]);
       
-      // Check if the file already exists locally
-      const fileInfo = await FileSystem.getInfoAsync(localUri);
-      let uri = localUri;
-      
-      // If file doesn't exist locally, download it from Firebase
-      if (!fileInfo.exists) {
-        uri = await downloadAudioFromFirebase(firebasePath, fileName);
-      }
-
       // Check if this sound is already in the mini player
       const isAlreadyAdded = miniPlayerSounds.some((s) => s.id === item.id);
-      if (!isAlreadyAdded) {
-        // Add the sound to the mini player with its local URI
-        const updatedSounds = [...miniPlayerSounds, { ...item, uri }];
+      if (isAlreadyAdded) {
+        // Sound is already playing, no need to add it again
+        setLoadingIds((prev) => prev.filter((id) => id !== item.id));
+        return;
+      }
+      
+      // Check if the file exists locally
+      const { exists, uri: localUri } = await checkLocalAudioFile(fileName);
+      
+      if (exists) {
+        // File exists locally, play from local storage
+        const updatedSounds = [...miniPlayerSounds, { ...item, uri: localUri }];
+        updateMiniPlayerSounds(updatedSounds);
+        showMiniPlayer(updatedSounds);
+      } else {
+        // File doesn't exist locally, stream and download in background
+        const { streamingUrl, localUri } = await streamAndDownloadAudio(
+          firebasePath,
+          fileName,
+          null, // No progress callback
+          // Completion callback
+          (finalUri) => {
+            // Use the ref to get the current sounds list
+            const currentSounds = miniPlayerSoundsRef.current;
+            
+            // Only update if the sound is still in the player
+            if (currentSounds.some(sound => sound.id === item.id)) {
+              // Update the sound in the player with the local URI once download completes
+              const updatedSounds = currentSounds.map(sound => 
+                sound.id === item.id ? { ...sound, uri: finalUri } : sound
+              );
+              updateMiniPlayerSounds(updatedSounds);
+            }
+          }
+        );
+        
+        // Add the sound to the mini player with the streaming URL for immediate playback
+        const updatedSounds = [...miniPlayerSounds, { ...item, uri: streamingUrl }];
         updateMiniPlayerSounds(updatedSounds);
         showMiniPlayer(updatedSounds);
       }
-
-      // No longer navigate to MainPlayer, just show the mini player
     } catch (error) {
-      Alert.alert("Download failed", error.message || "An error occurred while downloading.");
+      Alert.alert("Playback failed", error.message || "An error occurred while playing the sound.");
     } finally {
-      // Remove this sound's ID from loading state regardless of success/failure
+      // Remove this sound's ID from loading state
       setLoadingIds((prev) => prev.filter((id) => id !== item.id));
     }
   };
@@ -234,6 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E1E1E", // Slightly lighter than background for buttons
     borderRadius: 50, // Circular buttons
     padding: 15,
+    overflow: "hidden", // Ensure progress bar doesn't overflow the circle
   },
   gridText: {
     color: "white", // White text for readability on dark background
@@ -243,6 +276,7 @@ const styles = StyleSheet.create({
     width: 70, // Fixed width for text container
     height: 30, // Fixed height for text area
   },
+
 });
 
 /**

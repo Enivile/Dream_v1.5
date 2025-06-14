@@ -28,7 +28,19 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-video"
+      "expo-video",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#0D47A1",
+          "sounds": ["./assets/sounds/notification_sound.wav"],
+          "androidMode": "default",
+          "androidCollapsedTitle": "DreamApp",
+          "iosDisplayInForeground": true,
+          "defaultChannelId": "sleep-reminders"
+        }
+      ]
     ],
     "extra": {
       "eas": {

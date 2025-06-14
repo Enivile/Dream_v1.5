@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePage from "../screens/HomeScreens/HomePage";
 import AidsScreen from "../screens/HomeScreens/AidsScreen";
@@ -7,98 +7,117 @@ import { Ionicons } from "@expo/vector-icons";
 import Tracker from "../screens/HomeScreens/Tracker";
 import Report from "../screens/HomeScreens/Report"
 import Profile from "../screens/HomeScreens/Profile";
-import { LinearGradient } from 'expo-linear-gradient'; 
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import colors from "../theme/colors";
+import shadows from "../theme/shadows";
 
-
+const { width } = Dimensions.get('window');
 const Tab = createBottomTabNavigator();
 
 const HomeNavigator = () => {
   return (
     <Tab.Navigator
-      tabBarStyle={styles.menu}
       initialRouteName="HomePage"
       screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false, // Hide labels
+        headerShown: false, // No header as requested
+        tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "#1c1c1c",
-          borderColor: 'transparent',
-          height: 50,
-          paddingTop: 5,
+          position: 'absolute',
+          bottom: 0,
+          left: 20,
+          right: 20,
+          elevation: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          borderTopEndRadius: 25,
+          borderTopStartRadius: 25,
+          height: 65,
+          ...shadows.medium,
+          borderTopWidth: 0,
+          // overflow: 'hidden',
         },
-        tabBarActiveTintColor: "#fff",  // Change active item color
+        tabBarBackground: () => (
+          <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+        ),
+        tabBarActiveTintColor: "rgba(137, 43, 226, 1)", // Using a more vibrant purple than the accent
+        tabBarInactiveTintColor: colors.softWhite,
       }}
     >
       <Tab.Screen
-        styles={styles.menuItem}
         name="HomePage"
         component={HomePage}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <View style={styles.sty}>
-              <Ionicons name="home-outline" size={size} color={color} />
-              <Text style={styles.menuText}>Home</Text>
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={styles.tabItem}>
+              <View style={focused ? styles.activeIconBackground : styles.IconBackground}>
+                <Ionicons name="home-outline" size={24} color={color} />
+              </View>
+              <Text style={[styles.menuText, { color }]}>Home</Text>
             </View>
           ),
         }}
       />
       <Tab.Screen
-        styles={styles.menuItem}
         name="AidsScreen"
         component={AidsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Ionicons name="musical-notes-outline" size={size} color={color} />
-              <Text style={styles.menuText}>Aids</Text>
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={styles.tabItem}>
+              <View style={focused ? styles.activeIconBackground : styles.IconBackground}>
+                <Ionicons name="musical-notes-outline" size={24} color={color} />
+              </View>
+              <Text style={[styles.menuText, { color }]}>Aids</Text>
             </View>
           ),
         }}
       />
       <Tab.Screen
-        styles={styles.menuItem}
         name="Tracker"
         component={Tracker}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <View>
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={styles.tabItem}>
               <LinearGradient
-                // Start and end points for the gradient direction
-                start={{ x: 0, y: 0.20 }} // Gradient starts from the top-left corner
-                end={{ x: 0, y: 0.80 }} // Gradient ends at the bottom-right corner
-                colors={['#172d99', '#172d99']} // Colors for the gradient
-                style={styles.menuItemTracker} // Style for the container
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                colors={["rgba(137, 43, 226, 1)", '#172d99']} // Changed from green to purple
+                style={[styles.trackerButton, focused ? styles.activeTrackerButton : null]}
               >
-                <Ionicons style={styles.menuItemTracker} name="moon-outline" size={size} color={color} />
-                </LinearGradient>
-                <Text style={styles.menuText}>Tracker</Text>
-              
+                <Image 
+                  source={require('../../assets/Icons/Tracker.png')} 
+                  style={styles.trackerIcon} 
+                  resizeMode="contain" 
+                />
+              </LinearGradient>
+              <Text style={[styles.menuText, { color }]}>Tracker</Text>
             </View>
           ),
         }}
       />
       <Tab.Screen
-        styles={styles.menuItem}
         name="Journal"
         component={Report}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Ionicons name="pulse-outline" size={size} color={color} />
-              <Text style={styles.menuText}>Report</Text>
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={styles.tabItem}>
+              <View style={focused ? styles.activeIconBackground : styles.IconBackground}>
+                <Ionicons name="pulse-outline" size={24} color={color} />
+              </View>
+              <Text style={[styles.menuText, { color }]}>Report</Text>
             </View>
           ),
         }}
       />
       <Tab.Screen
-        styles={styles.menuItem}
         name="Settings"
         component={Profile}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <View style={styles.Tracker}>
-              <Ionicons name="person-circle-outline" size={size} color={color} />
-              <Text style={styles.menuText} size={8}>Profile</Text>
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={styles.tabItem}>
+              <View style={focused ? styles.activeIconBackground : styles.IconBackground}>
+                <Ionicons name="person-circle-outline" size={24} color={color} />
+              </View>
+              <Text style={[styles.menuText, { color }]}>Profile</Text>
             </View>
           ),
         }}
@@ -114,32 +133,47 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  menu: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
+  tabItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 10,
+    
   },
-  menuItemTracker: {
-    transform: [{ translateY: -5 }],
-    // backgroundColor: "#292c61",
-    // padding: 10,
-    // marginHorizontal: -10,
-    marginVertical: -10,
-    borderRadius: 100,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginHorizontal: -15,
+  IconBackground: {
+    borderRadius: 12,
+    padding: 8,
+    marginBottom: -5,
+  },  
+  activeIconBackground: {
+    backgroundColor: 'rgba(137, 43, 226, 0.15)', // Changed from green to purple
+    borderRadius: 12,
+    padding: 8,
+    marginBottom: -5,
   },
-  menuItem: {
-    paddingHorizontal: 20,
-    alignItems: "center",
+  trackerButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginTop: -15, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 0,
+    ...shadows.light,
+  },
+
+  activeTrackerButton: {
+    transform: [{ scale: 1.1 }],
+  },
+  trackerIcon: {
+    width: 30,
+    height: 30,
   },
   menuText: {
-    color: "rgb(211 211 211)",
-    fontSize: 9,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 3,
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginTop: 4,
+    width: 40, // Fixed width to prevent overflow
+    textAlign: 'center', // Center text to prevent overflow
   },
 });
 
