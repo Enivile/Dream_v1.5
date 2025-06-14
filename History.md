@@ -29,7 +29,7 @@ Implemented sleep reminder functionality in the profile section:
 - Added ability to schedule, cancel, and test notifications
 - Updated the profile UI to show the current reminder status
 - Configured notification settings in app.json
-- Added custom notification sound (notification-sound.wav) for sleep reminders
+- Added custom notification sound (notification_sound.wav) for sleep reminders
 - Updated all notification configurations to use the custom sound file
 - Added comprehensive debugging features to diagnose notification scheduling issues:
   - Console logs throughout `scheduleSleepReminder` function to track trigger configuration and scheduling process

@@ -34,7 +34,7 @@
         {
           "icon": "./assets/icon.png",
           "color": "#0D47A1",
-          "sounds": ["./assets/sounds/notification-sound.wav"],
+          "sounds": ["./assets/sounds/notification_sound.wav"],
           "androidMode": "default",
           "androidCollapsedTitle": "DreamApp",
           "iosDisplayInForeground": true,
